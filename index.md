@@ -73,6 +73,7 @@ nav_order: 99
   /* Collapsible groups */
   .group-toggle{ cursor:pointer; display:inline-flex; align-items:center; gap:.5rem; font-weight:600; }
   .caret{ display:inline-block; transition: transform .2s ease; }
+  .group-toggle[aria-expanded="true"] .caret {transform: rotate(90deg);}
   .caret[aria-expanded="true"]{ transform: rotate(90deg); }
   tr.child{ display:none; }
   tr.child.show{ display: table-row; }
