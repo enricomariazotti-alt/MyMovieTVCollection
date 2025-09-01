@@ -73,8 +73,8 @@ nav_order: 99
   /* Collapsible groups */
   .group-toggle{ cursor:pointer; display:inline-flex; align-items:center; gap:.5rem; font-weight:600; }
   .caret{ display:inline-block; transition: transform .2s ease; }
-  .group-toggle[aria-expanded="true"] .caret {transform: rotate(90deg);}
-  .caret[aria-expanded="true"]{ transform: rotate(90deg); }
+  /* Rotate caret when expanded */
+  .group-toggle[aria-expanded="true"] .caret{ transform: rotate(90deg); }
   tr.child{ display:none; }
   tr.child.show{ display: table-row; }
   .child .title{ padding-left: 1.5rem; color: var(--muted-text); font-weight: 500; }
@@ -100,7 +100,7 @@ nav_order: 99
 </tr>
 </thead>
 <tbody>
-  <!-- GROUP: Batman Trilogy (already grouped) -->
+  <!-- GROUP: Batman Trilogy -->
   <tr class="group" data-group="batman">
     <td>
       <button class="group-toggle" data-target="batman" aria-expanded="false" aria-controls="batman-rows">
@@ -131,7 +131,7 @@ nav_order: 99
     <td class="mono">—</td><td>—</td><td>1</td><td>—</td>
   </tr>
 
-  <!-- GROUP: Cars 1–3 (already grouped) -->
+  <!-- GROUP: Cars 1–3 -->
   <tr class="group" data-group="cars">
     <td>
       <button class="group-toggle" data-target="cars" aria-expanded="false" aria-controls="cars-rows">
@@ -154,7 +154,7 @@ nav_order: 99
     <td class="mono">—</td><td>2017</td><td>1</td><td>—</td>
   </tr>
 
-  <!-- GROUP: Dexter Collection (already grouped) -->
+  <!-- GROUP: Dexter Collection -->
   <tr class="group" data-group="dexter">
     <td>
       <button class="group-toggle" data-target="dexter" aria-expanded="false" aria-controls="dexter-rows">
@@ -272,6 +272,29 @@ nav_order: 99
   <tr class="child" data-parent="matrix">
     <td class="title">Disc 3 — The Matrix Revolutions (2003)</td>
     <td class="mono">—</td><td>2003</td><td>1</td><td>—</td>
+  </tr>
+
+  <!-- GROUP: How to Train Your Dragon 1–3 -->
+  <tr class="group" data-group="httyd">
+    <td>
+      <button class="group-toggle" data-target="httyd" aria-expanded="false" aria-controls="httyd-rows">
+        <span class="caret" aria-hidden="true">▶</span> How to Train Your Dragon 1–3
+      </button>
+    </td>
+    <td>5053083188269</td><td>2019</td><td>3</td>
+    <td><img alt="HTTYD 1–3" src="https://www.icollecteverything.com/images/movie/main/316/3163610_1.jpg"></td>
+  </tr>
+  <tr id="httyd-rows" class="child" data-parent="httyd">
+    <td class="title">Disc 1 — How to Train Your Dragon (2010)</td>
+    <td class="mono">—</td><td>2010</td><td>1</td><td>—</td>
+  </tr>
+  <tr class="child" data-parent="httyd">
+    <td class="title">Disc 2 — How to Train Your Dragon 2 (2014)</td>
+    <td class="mono">—</td><td>2014</td><td>1</td><td>—</td>
+  </tr>
+  <tr class="child" data-parent="httyd">
+    <td class="title">Disc 3 — How to Train Your Dragon: The Hidden World (2019)</td>
+    <td class="mono">—</td><td>2019</td><td>1</td><td>—</td>
   </tr>
 
   <!-- GROUP: Ice Age 1–5 -->
@@ -406,7 +429,7 @@ nav_order: 99
     <td class="mono">—</td><td>2017</td><td>1</td><td>—</td>
   </tr>
 
-  <!-- Single titles (translated to English) -->
+  <!-- Single titles -->
   <tr><td>Big Hero 6</td><td>8717418454111</td><td>2014</td><td>1</td><td><img src="https://www.icollecteverything.com/images/movie/main/195/1957543_1.jpg" alt="Big Hero 6"></td></tr>
   <tr><td>Captain America: The First Avenger</td><td>4010884250886</td><td>2011</td><td>2</td><td><img src="https://www.icollecteverything.com/images/movie/main/119/1199372_1.jpg" alt="CA First Avenger"></td></tr>
   <tr><td>Puss in Boots</td><td>5053083167899</td><td>2011</td><td>1</td><td><img src="https://www.icollecteverything.com/images/movie/main/316/3160293_1.jpg" alt="Puss in Boots"></td></tr>
@@ -441,13 +464,12 @@ function filterTable(){
     if (q && !matches(tr)) tr.style.display = 'none';
   });
 
-  // If a group is visible but its children are hidden by search, ensure children matching query are shown and group is expanded
+  // If a group has matching children, ensure the group row is visible & expanded, and children are shown
   groupRows.forEach(g => {
     const key = g.dataset.group;
     const kids = childRows.filter(c => c.dataset.parent === key);
     const anyKidVisibleByQuery = q && kids.some(k => (k.textContent || '').toUpperCase().includes(q));
     if (anyKidVisibleByQuery){
-      // show the group row if hidden by only-groups mismatch
       g.style.display = '';
       setExpanded(key, true);
       kids.forEach(k => {
@@ -458,8 +480,8 @@ function filterTable(){
 }
 
 function setExpanded(groupKey, expanded){
-  const btn = document.querySelector(`.group-toggle[data-target="\${groupKey}"]`);
-  const kids = document.querySelectorAll(\`tr.child[data-parent="\${groupKey}"]\`);
+  const btn  = document.querySelector(`.group-toggle[data-target="${groupKey}"]`);
+  const kids = document.querySelectorAll(`tr.child[data-parent="${groupKey}"]`);
   if (!btn) return;
   btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
   kids.forEach(k => k.classList.toggle('show', expanded));
@@ -477,9 +499,10 @@ addEventListener('click', (e) => {
 
 <!--
 NOTES:
-- All multi-film sets are now collapsible groups (Shrek 1–4, Iron Man Trilogy, Matrix Trilogy, Ice Age 1–5, Jurassic Park/World 6-Movie, Despicable Me/Minions 6-Movie, Transformers 5-Movie).
+- All multi-film sets are collapsible (Batman, Cars, Dexter, Shrek, Iron Man, Matrix, HTTYD, Ice Age, Jurassic, Despicable Me/Minions, Transformers 5-Movie).
 - Singles with German titles were translated to English.
-- Replace disc titles if your specific edition differs.
+- The caret rotates correctly using .group-toggle[aria-expanded="true"] .caret.
+- Search and "show only groups" filters work together with expansion-on-match.
 -->
 
 </body>
